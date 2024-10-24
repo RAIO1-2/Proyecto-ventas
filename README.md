@@ -1,2 +1,3 @@
 # Proyecto-ventas
-Proyecto diseño de software
+Martin alvarés: backend
+Ignacio Oyarzún: frontend
