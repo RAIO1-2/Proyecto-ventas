@@ -51,57 +51,60 @@ const CartPage = () => {
   );
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-2xl font-bold my-4">Carrito de compras</h1>
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <div className="container mx-auto">
+        <h1 className="text-2xl font-bold my-4 text-center">Carrito de compras</h1>
 
-      {cart.length > 0 ? (
-        <div className="flex flex-col space-y-4">
-          {cart.map((product) => (
-            <div key={product.id} className="flex justify-between items-center border p-4">
-              <div>
-                <h2 className="text-xl font-bold">{product.name}</h2>
-                <p>Precio unitario: ${product.price.toFixed(2)}</p>
-                <p>Total por producto: ${(product.price * product.quantity).toFixed(2)}</p>
+        {cart.length > 0 ? (
+          <div className="flex flex-col space-y-4">
+            {cart.map((product) => (
+              <div key={product.id} className="flex justify-between items-center border p-4 bg-gray-800 rounded-lg">
+                <div>
+                  <h2 className="text-xl font-bold">{product.name}</h2>
+                  <p>Precio unitario: ${product.price.toFixed(2)}</p>
+                  <p>Total por producto: ${(product.price * product.quantity).toFixed(2)}</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {/* Botón para disminuir la cantidad */}
+                  <button
+                    onClick={() => decreaseQuantity(product.id)}
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    disabled={product.quantity === 1} // Deshabilitar si la cantidad es 1
+                  >
+                    -
+                  </button>
+
+                  {/* Cantidad del producto */}
+                  <span>{product.quantity}</span>
+
+                  {/* Botón para aumentar la cantidad */}
+                  <button
+                    onClick={() => increaseQuantity(product.id)}
+                    className="bg-green-500 text-white px-2 py-1 rounded"
+                  >
+                    +
+                  </button>
+
+                  {/* Botón para eliminar el producto */}
+                  <button
+                    onClick={() => removeFromCart(product.id)}
+                    className="bg-red-700 text-white px-2 py-1 rounded"
+                  >
+                    Eliminar
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                {/* Botón para disminuir la cantidad */}
-                <button
-                  onClick={() => decreaseQuantity(product.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  -
-                </button>
+            ))}
 
-                {/* Cantidad del producto */}
-                <span>{product.quantity}</span>
-
-                {/* Botón para aumentar la cantidad */}
-                <button
-                  onClick={() => increaseQuantity(product.id)}
-                  className="bg-green-500 text-white px-2 py-1 rounded"
-                >
-                  +
-                </button>
-
-                {/* Botón para eliminar el producto */}
-                <button
-                  onClick={() => removeFromCart(product.id)}
-                  className="bg-red-700 text-white px-2 py-1 rounded"
-                >
-                  Eliminar
-                </button>
-              </div>
+            {/* Mostrar el total de la venta */}
+            <div className="border-t mt-4 pt-4">
+              <h2 className="text-xl font-bold text-center">Total de la venta: ${totalVenta.toFixed(2)}</h2>
             </div>
-          ))}
-
-          {/* Mostrar el total de la venta */}
-          <div className="border-t mt-4 pt-4">
-            <h2 className="text-xl font-bold">Total de la venta: ${totalVenta.toFixed(2)}</h2>
           </div>
-        </div>
-      ) : (
-        <p>Tu carrito está vacío.</p>
-      )}
+        ) : (
+          <p className="text-center">Tu carrito está vacío.</p>
+        )}
+      </div>
     </div>
   );
 };

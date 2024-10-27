@@ -50,26 +50,28 @@ const ProductsPage = () => {
   );
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-2xl font-bold my-4">Lista de Productos</h1>
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <div className="container mx-auto">
+        <h1 className="text-2xl font-bold my-4">Lista de Productos</h1>
 
-      {/* Barra de búsqueda */}
-      <input
-        type="text"
-        placeholder="Buscar productos..."
-        value={searchTerm}
-        onChange={handleSearch}
-        className="mb-4 p-2 border border-gray-300 rounded"
-      />
+        {/* Barra de búsqueda */}
+        <input
+          type="text"
+          placeholder="Buscar productos..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="mb-4 p-2 border border-gray-300 rounded text-black"
+        />
 
-      <div className="flex flex-wrap justify-center">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} addToCart={addToCart} />
-          ))
-        ) : (
-          <p>No se encontraron productos.</p>
-        )}
+        <div className="flex flex-wrap justify-center">
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} addToCart={addToCart} />
+            ))
+          ) : (
+            <p>No se encontraron productos.</p>
+          )}
+        </div>
       </div>
     </div>
   );
