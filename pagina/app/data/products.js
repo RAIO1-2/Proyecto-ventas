@@ -2,40 +2,47 @@ const products = [
     {
       id: 1,
       name: 'Cocacola',
-      description: 'Esta es una breve descripción del producto 1.',
+      description: 'El refresco de cola más vendido.',
       price: 2.99,
-      image: '/images/product1.jpg',
+      image: '/cocacola.jpeg',
     },
     {
       id: 2,
       name: 'Pepsi',
-      description: 'Esta es una breve descripción del producto 2.',
+      description: 'Refresco de cola con sabor suave.',
       price: 1.59,
-      image: '/images/product2.jpg',
+      image: '/pepsi.jpg',
     },
     // Puedes agregar más productos aquí
     {
         id: 3,
         name: 'Fanta',
-        description: 'Esta es una breve descripción del producto 2.',
+        description: 'Refresco de naranja con burbujas intensas.',
         price: 1.59,
-        image: '/images/product2.jpg',
+        image: '/fanta.webp',
     },
     {
       id: 4,
       name: 'Bilz',
-      description: 'Esta es una breve descripción del producto 2.',
+      description: 'Bebida chilena con sabor frutal único.',
       price: 0.59,
-      image: '/images/product2.jpg',
+      image: '/bilz.jpg',
     },
     // Puedes agregar más productos aquí
     {
         id: 5,
         name: 'Pap',
-        description: 'Esta es una breve descripción del producto 2.',
+        description: 'Refresco chileno con sabor a piña.',
         price: 2.59,
-        image: '/images/product2.jpg',
+        image: '/pap.webp',
     },
+    {
+      id: 6,
+      name: 'kem',
+      description: 'Refresco tropical con sabor exótico.',
+      price: 2.59,
+      image: '/kem.webp',
+  },
   ];
   
   export default products;

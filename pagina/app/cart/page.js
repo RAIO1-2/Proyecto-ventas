@@ -58,7 +58,7 @@ const CartPage = () => {
         {cart.length > 0 ? (
           <div className="flex flex-col space-y-4">
             {cart.map((product) => (
-              <div key={product.id} className="flex justify-between items-center border p-4 bg-gray-800 rounded-lg">
+              <div key={product.id} className="flex justify-between items-center border p-4 bg-gray-800 rounded-lg text-white">
                 <div>
                   <h2 className="text-xl font-bold">{product.name}</h2>
                   <p>Precio unitario: ${product.price.toFixed(2)}</p>
@@ -75,7 +75,7 @@ const CartPage = () => {
                   </button>
 
                   {/* Cantidad del producto */}
-                  <span>{product.quantity}</span>
+                  <span className="text-white">{product.quantity}</span>
 
                   {/* Botón para aumentar la cantidad */}
                   <button
