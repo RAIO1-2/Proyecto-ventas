@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
-import Notification from '../components/Notification'; // Import the Notification component
+import Notification from '../components/Notification';
 
 const translations = {
   en: {
@@ -23,9 +23,9 @@ const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [notifications, setNotifications] = useState([]); // State for notifications
-  const [language, setLanguage] = useState('en'); // Default language
-  const [loading, setLoading] = useState(true); // New loading state
+  const [notifications, setNotifications] = useState([]);
+  const [language, setLanguage] = useState('en');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -40,10 +40,30 @@ const ProductsPage = () => {
       } catch (error) {
         console.error('Failed to load products:', error);
       } finally {
-        setLoading(false); // Set loading to false after products are loaded
+        setLoading(false);
       }
     };
     loadProducts();
+  }, []);
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('language');
+    if (savedLanguage) {
+      setLanguage(savedLanguage);
+    }
+
+    // Listen for language changes in localStorage
+    const handleStorageChange = (e) => {
+      if (e.key === 'language') {
+        setLanguage(e.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    // Clean up the listener
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -65,17 +85,15 @@ const ProductsPage = () => {
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
 
-    // Show notification
     const newNotification = translations[language].addedToCart(product.name);
-    const notificationId = Date.now(); // Unique ID for each notification
+    const notificationId = Date.now();
     setNotifications((prev) => [
       ...prev,
       { id: notificationId, message: newNotification },
     ]);
 
-    // Automatically remove notification after X seconds
     setTimeout(() => {
-      setNotifications((prev) => prev.filter((n) => n.id !== notificationId)); // Remove specific notification
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
     }, 5000);
   };
 
@@ -95,7 +113,7 @@ const ProductsPage = () => {
         />
         <div className="flex flex-wrap justify-between gap-4" style={{ minHeight: '300px' }}>
           {loading ? (
-            <p className="text-white">Loading products...</p> // Placeholder while loading
+            <p className="text-white">Loading products...</p>
           ) : filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <div key={product.id} className="flex-grow">
@@ -103,7 +121,7 @@ const ProductsPage = () => {
                   product={product}
                   filename={product.filename}
                   addToCart={addToCart}
-                  translations={translations[language]} // Pass translations to ProductCard
+                  language={language}
                 />
               </div>
             ))
@@ -111,13 +129,12 @@ const ProductsPage = () => {
             <p className="text-white">{translations[language].noProductsFound}</p>
           )}
         </div>
-        {/* Render notifications */}
         <div className="fixed bottom-4 right-4 space-y-2">
           {notifications.map((notification) => (
             <Notification
               key={notification.id}
               message={notification.message}
-              onClose={() => setNotifications((prev) => prev.filter((n) => n.id !== notification.id))} // Dismiss specific notification
+              onClose={() => setNotifications((prev) => prev.filter((n) => n.id !== notification.id))}
             />
           ))}
         </div>
