@@ -1,0 +1,9 @@
+{
+    "id": 6,
+    "name": "Kem",
+    "description": {
+        "en": "Tropical soft drink with an exotic flavor.",
+        "es": "Refresco tropical con sabor exótico."
+    },
+    "price": 2.59
+}

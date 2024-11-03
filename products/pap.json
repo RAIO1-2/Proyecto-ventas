@@ -1,0 +1,9 @@
+{
+    "id": 5,
+    "name": "Pap",
+    "description": {
+        "en": "Chilean soda with pineapple flavor.",
+        "es": "Refresco chileno con sabor a piña."
+    },
+    "price": 2.59
+}

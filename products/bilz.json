@@ -1,0 +1,9 @@
+{
+    "id": 4,
+    "name": "Bilz",
+    "description": {
+        "en": "Chilean beverage with a unique fruity flavor.",
+        "es": "Bebida chilena con sabor frutal único."
+    },
+    "price": 0.59
+}

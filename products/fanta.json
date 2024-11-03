@@ -1,0 +1,9 @@
+{
+  "id": 3,
+  "name": "Fanta",
+  "description": {
+    "en": "Orange soda with intense bubbles.",
+    "es": "Refresco de naranja con burbujas intensas."
+  },
+  "price": 1.59
+}
