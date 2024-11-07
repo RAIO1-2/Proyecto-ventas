@@ -132,8 +132,8 @@ const CartPage = () => {
                 </div>
               </div>
             ))}
-            <div className="border-t mt-4 pt-4">
-              <h2 className="text-xl font-bold text-right">
+            <div className="border-t mt-4 pt-4 text-center">
+              <h2 className="text-xl font-bold">
                 {translations[language].totalSale}: ${totalVenta.toFixed(2)}
               </h2>
             </div>
