@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Notification from '../../components/Notification'; // Import the Notification component
 
 const CartPage = () => {
   const [cart, setCart] = useState([]);
-  const [notifications, setNotifications] = useState([]); // State for notifications
+  const [notifications, setNotifications] = useState([]);
+  const [error, setError] = useState('');
   const [language, setLanguage] = useState('en'); // Default language
 
-  // Define translations
+  // Traducciones
   const translations = {
     en: {
       cartTitle: 'Shopping Cart',
@@ -18,19 +18,20 @@ const CartPage = () => {
       remove: 'Remove',
       emptyCart: 'Your cart is empty.',
       removedFromCart: 'removed from cart!',
+      updateError: 'Error updating the cart.',
     },
     es: {
-      cartTitle: 'Carrito de compras',
-      unitPrice: 'Precio unitario',
-      totalForProduct: 'Total por producto',
-      totalSale: 'Total de la venta',
+      cartTitle: 'Carrito de Compras',
+      unitPrice: 'Precio Unitario',
+      totalForProduct: 'Total por Producto',
+      totalSale: 'Total de la Venta',
       remove: 'Eliminar',
       emptyCart: 'Tu carrito está vacío.',
       removedFromCart: 'eliminado del carrito!',
+      updateError: 'Error al actualizar el carrito.',
     },
   };
 
-  // Load language setting from localStorage
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language');
     if (savedLanguage) {
@@ -38,7 +39,7 @@ const CartPage = () => {
     }
   }, []);
 
-  // Load cart items from localStorage
+  // Cargar carrito desde localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem('cart');
     if (storedCart) {
@@ -46,48 +47,56 @@ const CartPage = () => {
     }
   }, []);
 
-  // Update cart and localStorage
+  // Actualizar carrito y localStorage
   const updateCart = useCallback((updatedCart) => {
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-  }, []);
+    try {
+      setCart(updatedCart);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+    } catch {
+      setError(translations[language].updateError);
+    }
+  }, [language, translations]);
 
-  // Modify product quantity in cart
+  // Modificar cantidad de productos en el carrito
   const modifyQuantity = (productId, change) => {
     const updatedCart = cart
       .map((product) => {
         if (product.id === productId) {
           const newQuantity = product.quantity + change;
-          return { ...product, quantity: Math.max(1, newQuantity) }; // Ensure quantity doesn't go below 1
+          return { ...product, quantity: Math.max(1, newQuantity) }; // Evitar cantidades menores a 1
         }
         return product;
       })
-      .filter((product) => product.quantity > 0); // Remove products with quantity 0
+      .filter((product) => product.quantity > 0); // Eliminar productos con cantidad 0
     updateCart(updatedCart);
   };
 
-  // Show notification
+  // Mostrar notificación
   const showNotification = (message) => {
-    const notificationId = Date.now(); // Unique ID for each notification
+    const notificationId = Date.now(); // ID único
     setNotifications((prev) => [...prev, { id: notificationId, message }]);
 
-    // Automatically remove notification after 5 seconds
+    // Eliminar notificación después de 5 segundos
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
     }, 5000);
   };
 
-  // Remove product from cart
+  // Eliminar producto del carrito
   const removeFromCart = (productId) => {
-    const productToRemove = cart.find((product) => product.id === productId);
-    if (productToRemove) {
-      const updatedCart = cart.filter((product) => product.id !== productId);
-      updateCart(updatedCart);
-      showNotification(`${productToRemove.name} ${translations[language].removedFromCart}`);
+    try {
+      const productToRemove = cart.find((product) => product.id === productId);
+      if (productToRemove) {
+        const updatedCart = cart.filter((product) => product.id !== productId);
+        updateCart(updatedCart);
+        showNotification(`${productToRemove.name} ${translations[language].removedFromCart}`);
+      }
+    } catch {
+      setError(translations[language].updateError);
     }
   };
 
-  // Calculate total sale amount
+  // Calcular total de la venta
   const totalVenta = cart.reduce((total, product) => total + product.price * product.quantity, 0);
 
   return (
@@ -95,24 +104,30 @@ const CartPage = () => {
       <div className="container mx-auto">
         <h1 className="text-2xl font-bold my-4 text-left">{translations[language].cartTitle}</h1>
 
+        {error && <p className="text-red-500 text-center">{error}</p>}
+
         {cart.length > 0 ? (
           <div className="flex flex-col space-y-4">
             {cart.map((product) => (
-              <div key={product.id} className="flex justify-between items-center border p-4 bg-gray-800 rounded-lg">
+              <div
+                key={product.id}
+                className="flex justify-between items-center border p-4 bg-gray-800 rounded-lg"
+              >
                 <div>
                   <h2 className="text-xl font-bold">{product.name}</h2>
                   <p className="text-gray-300">
                     {translations[language].unitPrice}: ${product.price.toFixed(2)}
                   </p>
                   <p className="text-gray-300">
-                    {translations[language].totalForProduct}: ${(product.price * product.quantity).toFixed(2)}
+                    {translations[language].totalForProduct}:{' '}
+                    ${(product.price * product.quantity).toFixed(2)}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => modifyQuantity(product.id, -1)}
                     className="bg-red-500 text-white px-2 py-1 rounded"
-                    disabled={product.quantity === 1} // Disable if quantity is 1
+                    disabled={product.quantity === 1} // Desactivar si la cantidad es 1
                   >
                     -
                   </button>
@@ -141,16 +156,16 @@ const CartPage = () => {
         ) : (
           <p className="text-center text-white">{translations[language].emptyCart}</p>
         )}
-        
-        {/* Render notifications */}
+
+        {/* Renderizar notificaciones */}
         <div className="fixed bottom-4 right-4 space-y-2">
           {notifications.map((notification) => (
-            <Notification
+            <div
               key={notification.id}
-              message={notification.message}
-              onClose={() => setNotifications((prev) => prev.filter((n) => n.id !== notification.id))} // Dismiss specific notification
-              className="bg-red-600" // Add red background specifically for cart notifications
-            />
+              className="bg-red-600 text-white p-2 rounded shadow-lg"
+            >
+              {notification.message}
+            </div>
           ))}
         </div>
       </div>

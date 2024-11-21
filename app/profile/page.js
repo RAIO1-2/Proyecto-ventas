@@ -14,6 +14,8 @@ const translations = {
     updateProfile: 'Update Profile',
     loading: 'Loading...',
     profileNotFound: 'Profile not found. Please log in.',
+    invalidEmail: 'Invalid email format.',
+    updateError: 'Error updating profile. Please try again.',
   },
   es: {
     adjustProfile: 'Ajustar Perfil',
@@ -25,6 +27,8 @@ const translations = {
     updateProfile: 'Actualizar Perfil',
     loading: 'Cargando...',
     profileNotFound: 'Perfil no encontrado. Por favor inicie sesión.',
+    invalidEmail: 'Formato de correo electrónico inválido.',
+    updateError: 'Error al actualizar el perfil. Intenta nuevamente.',
   },
 };
 
@@ -34,15 +38,15 @@ const ProfilePage = () => {
     email: '',
     password: '',
     address: '',
-    profilePicture: ''
+    profilePicture: '',
   });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
-  const [language, setLanguage] = useState('en'); // Default language
+  const [language, setLanguage] = useState('en');
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
     if (loggedInUser) {
       setUser(loggedInUser);
@@ -53,8 +57,20 @@ const ProfilePage = () => {
     setLoading(false);
   }, [router]);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleUpdateProfile = async (event) => {
     event.preventDefault();
+    setError('');
+
+    // Validación del formato de correo
+    if (!validateEmail(user.email)) {
+      setError(translations[language].invalidEmail);
+      return;
+    }
 
     try {
       const response = await fetch('/api/updateProfile', {
@@ -66,14 +82,13 @@ const ProfilePage = () => {
       });
 
       if (response.ok) {
-        alert(translations[language].profileUpdated);
+        alert('Profile updated successfully!');
       } else {
         const errorData = await response.json();
-        alert(errorData.message);
+        setError(errorData.message || translations[language].updateError);
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('An error occurred while updating the profile. Please try again.');
+      setError(translations[language].updateError);
     }
   };
 
@@ -84,19 +99,17 @@ const ProfilePage = () => {
       reader.onloadend = () => {
         setUser((prevUser) => ({
           ...prevUser,
-          profilePicture: reader.result || ''
+          profilePicture: reader.result || '',
         }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Show loading indicator if still loading
   if (loading) {
     return <div className="text-center py-8">{translations[language].loading}</div>;
   }
 
-  // If not authenticated, show a message or redirect
   if (!authenticated) {
     return (
       <div className="text-center py-8">
@@ -106,7 +119,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 pt-20"> {/* Added pt-20 for padding-top */}
+    <div className="container mx-auto py-8 pt-20">
       <h1 className="text-3xl font-bold mb-4">{translations[language].adjustProfile}</h1>
       <form onSubmit={handleUpdateProfile}>
         <div className="mb-4">
@@ -139,7 +152,6 @@ const ProfilePage = () => {
             value={user.password}
             onChange={(e) => setUser({ ...user, password: e.target.value })}
             className="border p-2 w-full text-black"
-            required
           />
         </div>
         <div className="mb-4">
@@ -150,7 +162,6 @@ const ProfilePage = () => {
             value={user.address}
             onChange={(e) => setUser({ ...user, address: e.target.value })}
             className="border p-2 w-full text-black"
-            required
           />
         </div>
         <div className="mb-4">
@@ -173,6 +184,7 @@ const ProfilePage = () => {
         <button type="submit" className="bg-blue-500 text-black px-4 py-2 rounded">
           {translations[language].updateProfile}
         </button>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </form>
     </div>
   );
