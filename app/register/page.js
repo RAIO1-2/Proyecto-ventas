@@ -1,154 +1,225 @@
 'use client';
 
+import { AvalynxAlert } from 'avalynx-alert';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
-const translations = {
-  en: {
-    title: 'Register Account',
-    email: 'Email Address *',
-    password: 'Password *',
-    confirmPassword: 'Confirm Password *',
-    registerError: 'User already exists.',
-    passwordsDoNotMatch: 'Passwords do not match.',
-    invalidEmail: 'Invalid email format.',
-    createAccount: 'Create Account',
-    alreadyHaveAccount: 'Already have an account?',
-    alreadyHaveAccount2: 'Log in',
-  },
-  es: {
-    title: 'Registrar Cuenta',
-    email: 'Correo Electrónico *',
-    password: 'Contraseña *',
-    confirmPassword: 'Confirmar Contraseña *',
-    registerError: 'El usuario ya existe.',
-    passwordsDoNotMatch: 'Las contraseñas no coinciden.',
-    invalidEmail: 'Formato de correo electrónico inválido.',
-    createAccount: 'Crear Cuenta',
-    alreadyHaveAccount: '¿Ya tienes cuenta?',
-    alreadyHaveAccount2: 'Iniciar sesión',
-  },
+const SignUp = () => {
+    const t = useTranslations('Register');
+    const errors = useTranslations('errors');
+    const validation = useTranslations('validation')
+
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        confirmPassword: '',
+        agreeToTerms: false,
+    });
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleChange = ({ target: { id, value, type, checked } }) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [id]: type === 'checkbox' ? checked : value,
+        }));
+    };
+
+    const [validationErrors, setValidationErrors] = useState({
+        email: '',
+        password: '',
+        confirmPassword: '',
+    });
+
+    const validateField = (id, value) => {
+        let error = '';
+        switch (id) {
+            case 'email':
+                error = value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                    ? ''
+                    : validation('invalid_email');
+                break;
+            case 'password':
+                error = value.length >= 8
+                    ? ''
+                    : validation('short_password', { chars: 8 });
+                break;
+            case 'confirmPassword':
+                if (!showPassword) {
+                    error = value === formData.password
+                        ? ''
+                        : validation('password_mismatch');
+                }
+                break;
+            default:
+                break;
+        }
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            [id]: error,
+        }));
+    };
+
+    const [submitting, setSubmitting] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (submitting) return;
+
+        setSubmitting(true);
+        try {
+            const { email, password } = formData;
+
+            const response = await fetch('/api/user/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (!response.ok) {
+                if (response.status === 409) {
+                    setValidationErrors((prevErrors) => ({
+                        ...prevErrors,
+                        email: validation('email_in_use'),
+                    }));
+                } else {
+                    const errorStatus = response.status.toString();
+                    const customMessage = errors(errorStatus, { defaultValue: errors('generic') });
+                    const errorMessage = response.headers.get('Content-Type')?.includes('application/json')
+                        ? (await response.json()).message
+                        : `Error ${errorStatus}: ${customMessage}`;
+                    throw new Error(errorMessage);
+                }
+                return;
+            }
+
+            await response.json();
+            window.location.href = '/';
+        } catch (error) {
+            new AvalynxAlert(error.message, 'danger', {
+                duration: 8000,
+                position: 'top-right',
+                closeable: true,
+                autoClose: true,
+                width: '400px',
+            });
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+
+    const isFormValid =
+        Object.values(validationErrors).every((error) => !error) &&
+        formData.email &&
+        formData.password &&
+        formData.agreeToTerms &&
+        (showPassword || (formData.confirmPassword && !validationErrors.confirmPassword));
+
+    useEffect(() => {
+        if (showPassword) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                confirmPassword: '',
+            }));
+        } else if (formData.confirmPassword) {
+            validateField('confirmPassword', formData.confirmPassword);
+        }
+    }, [showPassword, formData.password, formData.confirmPassword]);
+
+    return (
+        <main className="container d-flex flex-column justify-content-center align-items-center" style={{ height: '100vh' }}>
+            <form className="needs-validation ignore-padding" onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '330px', padding: '1rem' }} noValidate>
+                <h1 className="h3 mb-3 fw-normal text-center">{t('title')}</h1>
+
+                <div className="form-floating mb-2">
+                    <input
+                        type="email"
+                        className={`form-control ${validationErrors.email ? 'is-invalid' : ''}`}
+                        id="email"
+                        placeholder="name@example.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        onInput={({ target }) => validateField(target.id, target.value)}
+                        required
+                        aria-label="Email address"
+                    />
+                    <label htmlFor="email">{t('email')}</label>
+                    <div className="invalid-feedback">{validationErrors.email}</div>
+                </div>
+
+                <div className="form-floating mb-2">
+                    <input
+                        type={showPassword ? 'text' : 'password'}
+                        className={`form-control ${validationErrors.password ? 'is-invalid' : ''}`}
+                        id="password"
+                        placeholder="Password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        onInput={({ target }) => validateField(target.id, target.value)}
+                        required
+                        aria-label="Password"
+                    />
+                    <label htmlFor="password">{t('password')}</label>
+                    <div className="invalid-feedback">{validationErrors.password}</div>
+                </div>
+
+                {!showPassword && (
+                    <div className="form-floating mb-2">
+                        <input
+                            type="password"
+                            className={`form-control ${validationErrors.confirmPassword ? 'is-invalid' : ''}`}
+                            id="confirmPassword"
+                            placeholder="Confirm Password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            onInput={({ target }) => validateField(target.id, target.value)}
+                            required
+                            aria-label="Confirm Password"
+                        />
+                        <label htmlFor="confirmPassword">{t('confirm_password')}</label>
+                        <div className="invalid-feedback">{validationErrors.confirmPassword}</div>
+                    </div>
+                )}
+
+                <button
+                    type="button"
+                    className="btn btn-link p-0 text-decoration-none"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={`${showPassword ? `${t('hide')}` : `${t('show')}`} ${t('password')}`}
+                >
+                    {showPassword ? t('hide') : t('show')} {t('password')}
+                </button>
+
+                <div className="form-check my-3">
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="agreeToTerms"
+                        checked={formData.agreeToTerms}
+                        onChange={handleChange}
+                        required
+                    />
+                    <label className="form-check-label" htmlFor="agreeToTerms">
+                        {`${t('agree_to')} `}
+                        <a href="/tos" className="text-end text-decoration-none">{t('terms')}</a>.
+                    </label>
+                </div>
+
+                <button
+                    className="btn btn-primary w-100 py-2"
+                    type="submit"
+                    disabled={!isFormValid}
+                >
+                    {t('sign_up')}
+                </button>
+
+                <p className="text-center mt-4">
+                    {`${t('already_have_account')}?`} <a href="/login" className="text-decoration-none">{t('login')}</a>.
+                </p>
+            </form>
+        </main>
+    );
 };
 
-const RegisterPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [language, setLanguage] = useState('en');
-  const router = useRouter();
-
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
-    }
-  }, []);
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const handleRegister = async (event) => {
-    event.preventDefault();
-    setError('');
-
-    if (!validateEmail(email)) {
-      setError(translations[language].invalidEmail);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError(translations[language].passwordsDoNotMatch);
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const { message } = await response.json();
-        throw new Error(translations[language].registerError);
-      }
-
-      router.push('/login');
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-      <div className="w-80 bg-indigo-50 rounded-lg shadow-lg p-8">
-        <h1 className="text-2xl font-bold text-center text-indigo-700 mb-6">
-          {translations[language].title}
-        </h1>
-        <form onSubmit={handleRegister} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block font-semibold text-gray-700 mb-1">
-              {translations[language].email}
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block font-semibold text-gray-700 mb-1">
-              {translations[language].password}
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="confirmPassword" className="block font-semibold text-gray-700 mb-1">
-              {translations[language].confirmPassword}
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-3 border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
-              required
-            />
-          </div>
-
-          {error && <p className="text-red-500 text-center">{error}</p>}
-
-          <button
-            type="submit"
-            className="w-full py-3 bg-indigo-500 text-white rounded-lg font-semibold hover:bg-indigo-400 transition-colors"
-          >
-            {translations[language].createAccount}
-          </button>
-        </form>
-        <p className="text-center text-xs text-gray-600 mt-4">
-          {translations[language].alreadyHaveAccount}{' '}
-          <a href="/login" className="text-indigo-500 hover:underline">
-            {translations[language].alreadyHaveAccount2}
-          </a>
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export default RegisterPage;
+export default SignUp;

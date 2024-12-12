@@ -1,0 +1,126 @@
+{
+  "language": "English",
+  "flag": "US",
+  "currency": "USD",
+  "navbar": {
+    "navigation": {
+      "home": "Home",
+      "shop": "Shop",
+      "faqs": "FAQs",
+      "about": "About",
+      "contact": "Contact Us"
+    },
+    "buttons": {
+      "language": "Language",
+      "cart": "Cart",
+      "login": "Login",
+      "profile": "Profile"
+    },
+    "options": {
+      "settings": "Settings",
+      "profile": "Profile",
+      "logout": "Logout"
+    }
+  },
+  "Home": {},
+  "Login": {
+    "title": "Login",
+    "email": "Email address",
+    "password": "Password",
+    "remember": "Remember me",
+    "forgot": "Forgot password",
+    "sign": "Sign in",
+    "no_account": "Don't have an account?",
+    "create_account": "Create one"
+  },
+  "Register": {
+    "title": "Sign Up",
+    "email": "Email address",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "agree_to": "I agree to the",
+    "terms": "Terms and Conditions",
+    "sign_up": "Sign up",
+    "already_have_account": "Already have an account",
+    "login": "Login",
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "Shop": {
+    "products": "Products",
+    "search": "Search",
+    "search_product": "Search products...",
+    "category": "Categories",
+    "apply_filters": "Apply Filters",
+    "reset_filters": "Reset Filters",
+    "new_product": "Create a Product",
+    "error": "Error",
+    "no_products_found": "No products found",
+    "categories": {
+      "all": "All",
+      "digital": "Digital",
+      "soft_drink": "Soft Drink"
+    }
+  },
+  "Cart": {
+    "your_cart": "Your Cart",
+    "product": "Product",
+    "quantity": "Quantity",
+    "unit_price": "Price per Unit",
+    "total_price": "Total Price",
+    "discount": "Discount",
+    "total": "Total ({currency})",
+    "empty": "There are no items inside your cart."
+  },
+  "productEditor": {
+    "shop": "Shop",
+    "product": "Product",
+    "edit": "Edit",
+    "name": "Name",
+    "thumbnail": "Thumbnail",
+    "description": "Description",
+    "category": "Category",
+    "price": "Price",
+    "discountedPrice": "Discounted Price",
+    "stock": "Stock",
+    "limit": "Limit",
+    "return": "Return",
+    "delete": "Delete",
+    "revertChanges": "Revert Changes",
+    "saveChanges": "Save Changes",
+    "create": "Create Product",
+    "productSaved": "Product saved successfully!",
+    "errorProductNotFound": "Product not found.",
+    "no_price": "Not for sale",
+    "no_discount": "No discount",
+    "unlimited_stock": "Unlimited",
+    "no_limit": "Unlimited"
+  },
+  "product": {
+    "add": "Add to Cart",
+    "remove": "Remove from Cart",
+    "edit": "Edit Product",
+    "price": "Price",
+    "no_reviews": "No reviews",
+    "reviews": "Customer Reviews",
+    "added": "Added {product} to Cart.",
+    "removed": "Removed {product} from Cart.",
+    "unavailable": "Unavailable",
+    "out_of_stock": "Out of Stock"
+  },
+  "validation": {
+    "invalid_email": "Please provide a valid email address.",
+    "short_password": "Password must be at least {chars} characters long.",
+    "password_mismatch": "Passwords do not match.",
+    "invalid_auth": "Invalid email address or password.",
+    "email_in_use": "This email is already in use."
+  },
+  "errors": {
+    "400": "Bad request.",
+    "401": "Unauthorized.",
+    "403": "Forbidden.",
+    "404": "Not found.",
+    "500": "Server error.",
+    "generic": "An error occurred."
+  }
+}

@@ -1,146 +1,95 @@
-'use client';
+import Image from "next/image";
+import styles from "./page.module.css";
 
-import { useState, useEffect } from 'react';
-import ProductCard from '../components/ProductCard';
-import Notification from '../components/Notification';
-
-const translations = {
-  en: {
-    searchPlaceholder: 'Search products...',
-    noProductsFound: 'No products found.',
-    addedToCart: (productName) => `${productName} added to cart!`,
-    addToCart: 'Add to Cart',
-  },
-  es: {
-    searchPlaceholder: 'Buscar productos...',
-    noProductsFound: 'No se encontraron productos.',
-    addedToCart: (productName) => `${productName} agregado al carrito!`,
-    addToCart: 'Agregar al Carrito',
-  },
-};
-
-const ProductsPage = () => {
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [notifications, setNotifications] = useState([]);
-  const [language, setLanguage] = useState('en');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const context = require.context('../products', false, /\.json$/);
-        const productData = context.keys().map((file) => {
-          const product = context(file);
-          const filename = file.replace('./', '').replace('.json', '');
-          return { ...product, filename };
-        });
-        setProducts(productData);
-      } catch (error) {
-        console.error('Failed to load products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProducts();
-  }, []);
-
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
-    }
-
-    // Listen for language changes in localStorage
-    const handleStorageChange = (e) => {
-      if (e.key === 'language') {
-        setLanguage(e.newValue);
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-
-    // Clean up the listener
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const storedCart = localStorage.getItem('cart');
-    if (storedCart) {
-      setCart(JSON.parse(storedCart));
-    }
-  }, []);
-
-  const addToCart = (product) => {
-    const updatedCart = cart.map((item) =>
-      item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-    );
-
-    if (!cart.find((item) => item.id === product.id)) {
-      updatedCart.push({ ...product, quantity: 1 });
-    }
-
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-
-    const newNotification = translations[language].addedToCart(product.name);
-    const notificationId = Date.now();
-    setNotifications((prev) => [
-      ...prev,
-      { id: notificationId, message: newNotification },
-    ]);
-
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
-    }, 5000);
-  };
-
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center">
-      <div className="container mx-auto mt-20">
-        <input
-          type="text"
-          placeholder={translations[language].searchPlaceholder}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="mb-4 p-2 border border-gray-300 rounded text-black w-full max-w-md"
+    <div className={styles.page}>
+      <main className={styles.main}>
+        <Image
+          className={styles.logo}
+          src="/next.svg"
+          alt="Next.js logo"
+          width={180}
+          height={38}
+          priority
         />
-        <div className="flex flex-wrap justify-between gap-4" style={{ minHeight: '300px' }}>
-          {loading ? (
-            <p className="text-white">Loading products...</p>
-          ) : filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <div key={product.id} className="flex-grow">
-                <ProductCard
-                  product={product}
-                  filename={product.filename}
-                  addToCart={addToCart}
-                  language={language}
-                />
-              </div>
-            ))
-          ) : (
-            <p className="text-white">{translations[language].noProductsFound}</p>
-          )}
-        </div>
-        <div className="fixed bottom-4 right-4 space-y-2">
-          {notifications.map((notification) => (
-            <Notification
-              key={notification.id}
-              message={notification.message}
-              onClose={() => setNotifications((prev) => prev.filter((n) => n.id !== notification.id))}
+        <ol>
+          <li>
+            Get started by editing <code>app/page.js</code>.
+          </li>
+          <li>Save and see your changes instantly.</li>
+        </ol>
+
+        <div className={styles.ctas}>
+          <a
+            className={styles.primary}
+            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              className={styles.logo}
+              src="/vercel.svg"
+              alt="Vercel logomark"
+              width={20}
+              height={20}
             />
-          ))}
+            Deploy now
+          </a>
+          <a
+            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.secondary}
+          >
+            Read our docs
+          </a>
         </div>
-      </div>
+      </main>
+      <footer className={styles.footer}>
+        <a
+          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
+            aria-hidden
+            src="/file.svg"
+            alt="File icon"
+            width={16}
+            height={16}
+          />
+          Learn
+        </a>
+        <a
+          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
+            aria-hidden
+            src="/window.svg"
+            alt="Window icon"
+            width={16}
+            height={16}
+          />
+          Examples
+        </a>
+        <a
+          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
+            aria-hidden
+            src="/globe.svg"
+            alt="Globe icon"
+            width={16}
+            height={16}
+          />
+          Go to nextjs.org →
+        </a>
+      </footer>
     </div>
   );
-};
-
-export default ProductsPage;
+}

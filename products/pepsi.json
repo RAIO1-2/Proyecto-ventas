@@ -1,9 +1,0 @@
-{
-  "id": 2,
-  "name": "Pepsi",
-  "description": {
-    "en": "Cola soft drink with a smooth taste.",
-    "es": "Refresco de cola con sabor suave."
-  },
-  "price": 1.59
-}

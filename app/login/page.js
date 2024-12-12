@@ -1,137 +1,154 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { AvalynxAlert } from 'avalynx-alert';
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
-const translations = {
-  en: {
-    title: 'Welcome Back!',
-    email: 'Email Address *',
-    password: 'Password *',
-    forgotPassword: 'Forgot password?',
-    login: 'Login',
-    createAccount: 'Don’t have an account?',
-    createAccount2: 'Create one',
-    loginError: 'Incorrect email or password.',
-    invalidEmail: 'Invalid email format.',
-  },
-  es: {
-    title: '¡Hola de nuevo!',
-    email: 'Correo Electrónico *',
-    password: 'Contraseña *',
-    forgotPassword: '¿Olvidó la contraseña?',
-    login: 'Ingresar',
-    createAccount: '¿No tienes una cuenta?',
-    createAccount2: 'Crear cuenta',
-    loginError: 'Email o contraseña incorrectos.',
-    invalidEmail: 'Formato de correo electrónico inválido.',
-  },
+const Login = () => {
+    const t = useTranslations('Login');
+    const errors = useTranslations('errors');
+    const validation = useTranslations('validation')
+
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        rememberMe: false
+    });
+
+    const handleChange = ({ target: { id, value, type, checked } }) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [id]: type === 'checkbox' ? checked : value
+        }));
+        if (type !== 'checkbox') setInvalidAuth(false);
+    };
+
+    const [invalidEmail, setInvalidEmail] = useState(null);
+    const [isEmailFocused, setIsEmailFocused] = useState(false);
+    const [invalidAuth, setInvalidAuth] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+
+    const validateEmail = (value) => {
+        let error = value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+            ? ''
+            : validation('invalid_email');
+        setInvalidEmail(error)
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (submitting) return;
+
+        setSubmitting(true);
+        try {
+            const { email, password, rememberMe } = formData;
+            const response = await fetch('/api/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, rememberMe }),
+            });
+            if (!response.ok) {
+                const errorStatus = response.status;
+                if (errorStatus !== 401) {
+                    const customMessage = errors(errorStatus, { defaultValue: errors('generic') });
+                    const errorMessage = response.headers.get('Content-Type')?.includes('application/json')
+                        ? (await response.json()).message
+                        : `Error ${errorStatus.toString()}: ${customMessage}`;
+                    throw new Error(errorMessage);
+                } else {
+                    throw new Error(errorStatus);
+                }
+            }
+            await response.json();
+            window.location.href = '/';
+        } catch (error) {
+            console.log(error)
+            if (error == 'Error: 401') {
+                setInvalidAuth(validation('invalid_auth'));
+            } else {
+                new AvalynxAlert(error.message, 'danger', {
+                    duration: 8000,
+                    position: 'top-right',
+                    closeable: true,
+                    autoClose: true,
+                    width: '400px'
+                });
+            }
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    return (
+        <main className="container d-flex flex-column justify-content-center align-items-center" style={{ height: '100vh' }}>
+            <form className="needs-validation ignore-padding" onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '330px', padding: '1rem' }} noValidate>
+                <h1 className="h3 mb-3 fw-normal text-center">{t('title')}</h1>
+
+                <div className="form-floating mb-2">
+                    <input
+                        type="email"
+                        className={`form-control ${invalidAuth || (!isEmailFocused && invalidEmail) ? 'is-invalid' : ''}`}
+                        id="email"
+                        placeholder="name@example.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        onInput={({ target }) => validateEmail(target.value)}
+                        onFocus={() => setIsEmailFocused(true)}
+                        onBlur={() => setIsEmailFocused(false)}
+                        required
+                        aria-label="Email address"
+                    />
+                    <label htmlFor="email">{t('email')}</label>
+                    <div className="invalid-feedback">{!invalidAuth ? invalidEmail : ''}</div>
+                </div>
+
+                <div className="form-floating mb-2">
+                    <input
+                        type="password"
+                        className={`form-control ${invalidAuth ? 'is-invalid' : ''}`}
+                        id="password"
+                        placeholder="Password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        required
+                        aria-label="Password"
+                    />
+                    <label htmlFor="password">{t('password')}</label>
+                    <div className="invalid-feedback">{invalidAuth}</div>
+                </div>
+
+                <div className="form-check my-3 d-flex justify-content-between">
+                    <div>
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="rememberMe"
+                            checked={formData.rememberMe}
+                            onChange={handleChange}
+                        />
+                        <label className="form-check-label" htmlFor="rememberMe">
+                            {t('remember')}
+                        </label>
+                    </div>
+                    <a href="#" className="text-end text-decoration-none" aria-label="Forgot password">
+                        {`${t('forgot')}?`}
+                    </a>
+                </div>
+
+                <button
+                    className="btn btn-primary w-100 py-2"
+                    type="submit"
+                    disabled={invalidAuth || invalidEmail || formData.email == '' || formData.password == '' || submitting}
+                >
+                    {t('sign')}
+                </button>
+
+                <p className="text-center mt-4">
+                    {`${t('no_account')}`} <a href="/register" className="text-decoration-none">{t('create_account')}</a>.
+                </p>
+            </form>
+        </main>
+    );
 };
 
-const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [language, setLanguage] = useState('en');
-  const router = useRouter();
-
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
-    }
-  }, []);
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    setError('');
-
-    if (!validateEmail(email)) {
-      setError(translations[language].invalidEmail);
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error(translations[language].loginError);
-      }
-
-      const user = await response.json();
-      localStorage.setItem('loggedInUser', JSON.stringify(user));
-      router.push('/');
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
-      <div className="w-80 bg-indigo-50 rounded-lg shadow-lg p-8">
-        <h1 className="text-2xl font-bold text-center text-indigo-700 mb-6">
-          {translations[language].title}
-        </h1>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block font-semibold text-gray-700 mb-1">
-              {translations[language].email}
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block font-semibold text-gray-700 mb-1">
-              {translations[language].password}
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-indigo-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
-              required
-            />
-            <a href="#" className="block text-xs text-indigo-500 hover:underline text-right mt-2">
-              {translations[language].forgotPassword}
-            </a>
-          </div>
-
-          {error && <p className="text-red-500 text-center">{error}</p>}
-
-          <button
-            type="submit"
-            className="w-full py-3 bg-indigo-500 text-white rounded-lg font-semibold hover:bg-indigo-400 transition-colors"
-          >
-            {translations[language].login}
-          </button>
-        </form>
-        <p className="text-center text-xs text-gray-600 mt-4">
-          {translations[language].createAccount}{' '}
-          <a href="/register" className="text-indigo-500 hover:underline">
-            {translations[language].createAccount2}
-          </a>
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export default LoginPage;
+export default Login;

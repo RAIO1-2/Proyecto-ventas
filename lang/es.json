@@ -1,0 +1,126 @@
+{
+  "language": "Español",
+  "flag": "ES",
+  "currency": "USD",
+  "navbar": {
+    "navigation": {
+      "home": "Inicio",
+      "shop": "Tienda",
+      "faqs": "Preguntas Frecuentes",
+      "about": "Acerca de",
+      "contact": "Contáctanos"
+    },
+    "buttons": {
+      "language": "Idioma",
+      "cart": "Carrito",
+      "login": "Iniciar Sesión",
+      "profile": "Perfil"
+    },
+    "options": {
+      "settings": "Configuración",
+      "profile": "Perfil",
+      "logout": "Cerrar Sesión"
+    }
+  },
+  "Home": {},
+  "Login": {
+    "title": "Iniciar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "remember": "Recuérdame",
+    "forgot": "Olvidé mi contraseña",
+    "sign": "Iniciar Sesión",
+    "no_account": "¿No tienes una cuenta?",
+    "create_account": "Crea una"
+  },
+  "Register": {
+    "title": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "confirm_password": "Confirmar Contraseña",
+    "agree_to": "Estoy de acuerdo con los",
+    "terms": "Términos y Condiciones",
+    "sign_up": "Registrarse",
+    "already_have_account": "¿Ya tienes una cuenta?",
+    "login": "Iniciar Sesión",
+    "show": "Mostrar",
+    "hide": "Ocultar"
+  },
+  "Shop": {
+    "products": "Productos",
+    "search": "Buscar",
+    "search_product": "Buscar productos...",
+    "category": "Categorías",
+    "apply_filters": "Aplicar Filtros",
+    "reset_filters": "Restablecer Filtros",
+    "new_product": "Crear un Producto",
+    "error": "Error",
+    "no_products_found": "No se encontraron productos",
+    "categories": {
+      "all": "Todos",
+      "digital": "Digital",
+      "soft_drink": "Bebida Gaseosa"
+    }
+  },
+  "Cart": {
+    "your_cart": "Tu Carrito",
+    "product": "Producto",
+    "quantity": "Cantidad",
+    "unit_price": "Precio por Unidad",
+    "total_price": "Precio Total",
+    "discount": "Descuento",
+    "total": "Total ({currency})",
+    "empty": "No hay artículos en tu carrito."
+  },
+  "productEditor": {
+    "shop": "Tienda",
+    "product": "Producto",
+    "edit": "Editar",
+    "name": "Nombre",
+    "thumbnail": "Miniatura",
+    "description": "Descripción",
+    "category": "Categoría",
+    "price": "Precio",
+    "discountedPrice": "Precio con Descuento",
+    "stock": "Stock",
+    "limit": "Límite",
+    "return": "Regresar",
+    "delete": "Eliminar",
+    "revertChanges": "Revertir Cambios",
+    "saveChanges": "Guardar Cambios",
+    "create": "Crear Producto",
+    "productSaved": "¡Producto guardado con éxito!",
+    "errorProductNotFound": "Producto no encontrado.",
+    "no_price": "No está a la venta",
+    "no_discount": "Sin descuento",
+    "unlimited_stock": "Ilimitado",
+    "no_limit": "Ilimitado"
+  },
+  "product": {
+    "add": "Agregar al Carrito",
+    "remove": "Eliminar del Carrito",
+    "edit": "Editar Producto",
+    "price": "Precio",
+    "no_reviews": "Sin reseñas",
+    "reviews": "Reseñas de Clientes",
+    "added": "Agregado {product} al Carrito.",
+    "removed": "Eliminado {product} del Carrito.",
+    "unavailable": "No disponible",
+    "out_of_stock": "Agotado"
+  },
+  "validation": {
+    "invalid_email": "Por favor, proporciona una dirección de correo electrónico válida.",
+    "short_password": "La contraseña debe tener al menos {chars} caracteres.",
+    "password_mismatch": "Las contraseñas no coinciden.",
+    "invalid_auth": "Correo electrónico o contraseña inválidos.",
+    "email_in_use": "Este correo electrónico ya está en uso."
+  },
+  "errors": {
+    "400": "Solicitud incorrecta.",
+    "401": "No autorizado.",
+    "403": "Prohibido.",
+    "404": "No encontrado.",
+    "500": "Error del servidor.",
+    "generic": "Ocurrió un error."
+  }
+}
